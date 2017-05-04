@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<project name="apesconsole" default="buildWar" basedir=".">
+    <property environment="env" />
+	<property name="CATALINA_HOME" value="${CATALINA_HOME}" />
+	<property name="tomcat.path" value="/var/lib/tomcat7/webapps/" />
+    <property name="build.dir" value="${basedir}/build" />
+    <property name="src.dir" value="${basedir}/src" />
+    <property name="webinfDir" value="${basedir}/build/WEB-INF" />
+    <property name="lib.dir" value="${basedir}/build/WEB-INF/lib" />
+    <property name="classes.dir" value="${webinfDir}/classes" />
+	<property name="warFile" value="apesconsole.war" />
+
+    <target name="prepare">
+        <delete dir="${basedir}/build" />
+        <delete file="/home/pi/PlayGround/tomcat-ear/apesconsole.war" />
+        <mkdir dir="${basedir}/build" />
+        <mkdir dir="${basedir}/build/war" />
+        <mkdir dir="${build.dir}/WEB-INF/classes" />
+        <mkdir dir="${build.dir}/WEB-INF/lib" />
+        <mkdir dir="${build.dir}/WEB-INF/pages" />
+        <mkdir dir="${build.dir}/resources" />              
+    </target>
+    <target name="copy" depends="prepare">
+<!-- For moving resources to Base folder -->
+        <copy todir="${build.dir}/resources">
+            <fileset dir="${basedir}/WEB-INF/resources" includes="**/*.*" />
+        </copy>
+<!-- For moving jsp's to Base folder -->
+        <copy todir="${build.dir}/WEB-INF/pages">
+            <fileset dir="${basedir}/WEB-INF/pages/" includes="**/**.jsp,**/**.html" />
+        </copy>
+<!-- For moving jars from lib folder of base directory to WEB- folder -->
+        <copy todir="${build.dir}/WEB-INF/lib">
+            <fileset dir="${basedir}/WEB-INF/lib/" includes="**/*.*" excludes="*${basedir}/WEB-INF/lib/javax.servlet-api-3.1.0.jar"/>
+        </copy>
+<!-- For copying tld files -->        
+        <copy todir="${build.dir}/WEB-INF">
+        	<fileset dir="${basedir}/WEB-INF/" includes="**/*.tld,**/*.xml"/>
+		</copy>
+    </target>
+<!-- Build classpath -->
+    <path id="classpath">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar" />
+        </fileset>    	
+        <pathelement location="${classes.dir}" />
+    </path>
+<!-- =================================================================== -->
+<!-- Compiles the source code                                            -->
+<!-- =================================================================== -->
+    <target name="compile" depends="copy">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="on" deprecation="on" optimize="off">
+            <classpath refid="classpath" />		
+        </javac>
+    </target>
+	<!-- For copying Property files
+	<target name="copy-resource" depends="compile">
+		<copy todir="${build.dir}/WEB-INF/classes/com/apescosnole/">
+			<fileset dir="${basedir}/WEB-INF/classes/com/eklv/web/" includes="**/*.properties"/>
+		</copy>
+	</target> -->    
+    <target name="buildWar" depends="compile">
+        <jar jarfile="${basedir}/build/war/${warFile}" basedir="${build.dir}" excludes="war" />
+<!--give the correct path of jboss in this line and uncomment the line below to place the wars automatically into ur jboss dir-->
+        <echo message=" Copying the war file to location : ${tomcat.path}" />
+        <copy file="${basedir}/build/war/${warFile}" todir="/home/pi/PlayGround/tomcat-ear/" />
+    </target>
+</project>

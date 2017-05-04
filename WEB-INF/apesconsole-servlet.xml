@@ -1,0 +1,58 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:oxm="http://www.springframework.org/schema/oxm"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans     
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd  
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/oxm  
+        http://www.springframework.org/schema/oxm/spring-oxm-3.0.xsd">  
+       
+    <context:annotation-config />
+	<context:component-scan base-package="com.apesconsole.controller" /> 
+	       
+	<bean id="metaDataConfig" class="com.apesconsole.dto.MetaData">
+        <property name="groupList" value="Admin,Home,Guest"/>   
+    </bean>
+    
+    <bean id="validationService" class="com.apesconsole.services.impl.ValidationServiceImpl">
+    </bean>
+    
+    <bean id="gpIoService" class="com.apesconsole.services.impl.GpIoServiceImpl">
+    </bean>
+    
+    <bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+	  <property name="order" value="1" />
+	  <property name="mediaTypes">
+		<map>
+			<entry key="html" value="application/html" />
+		    <entry key="json" value="application/json" />
+		</map>
+	  </property>
+
+	  <property name="defaultViews">
+		<list>
+		  <!-- JSON View -->
+		  <bean
+			class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+				<property name="prefixJson" value="true"/>
+		  </bean>
+		 </list>
+	  </property>
+	</bean>
+    
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix">
+			<value>/WEB-INF/pages/</value>
+		</property>
+		<property name="suffix">
+			<value>.jsp</value>
+		</property>
+		<property name="order" value="2" />
+	</bean>
+</beans>
